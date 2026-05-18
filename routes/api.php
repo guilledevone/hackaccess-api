@@ -1,18 +1,16 @@
 <?php
 
-use App\Http\Controllers\Api\ParticipantController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Api\ParticipantController;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
-*/
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register']);
 
-Route::apiResource('participants', ParticipantController::class)
-    ->only(['index', 'store', 'destroy']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/user', [AuthController::class, 'me']);
+    Route::get('/participants', [ParticipantController::class, 'index']);
+    Route::post('/participants', [ParticipantController::class, 'store']);
+    Route::delete('/participants/{participant}', [ParticipantController::class, 'destroy']);
+});
