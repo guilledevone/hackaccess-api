@@ -1,38 +1,41 @@
 <?php
 
+
+
 namespace App\Http\Controllers;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
     public function login(Request $request)
-    {
-        $credentials = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
+{
+    $credentials = $request->validate([
+        'email' => 'required|email',
+        'password' => 'required|string',
+    ]);
 
-        if (!Auth::attempt($credentials)) {
-            return response()->json([
-                'message' => 'Credencials incorrectes'
-            ], 401);
-        }
+    $user = User::where('email', $credentials['email'])->first();
 
-        $user = Auth::user();
-        $token = $user->createToken('hackaccess-token')->plainTextToken;
-
+    if (!$user || !Hash::check($credentials['password'], $user->password)) {
         return response()->json([
-            'token' => $token,
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-            ]
-        ]);
+            'message' => 'Credencials incorrectes',
+        ], 401);
     }
 
+    $token = $user->createToken('hackaccess-token')->plainTextToken;
+
+    return response()->json([
+        'token' => $token,
+        'user' => [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+        ],
+    ]);
+}
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
