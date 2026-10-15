@@ -17,3 +17,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/participants/{participant}',             [ParticipantController::class, 'update']);
     Route::delete('/participants/{participant}',          [ParticipantController::class, 'destroy']);
 });
+Route::get('/health', function () {
+    return response()->json([
+        'status' => 'ok',
+        'app' => 'HackAccess API',
+    ]);
+});
